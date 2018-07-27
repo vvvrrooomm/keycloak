@@ -399,10 +399,11 @@ public abstract class AbstractOAuth2IdentityProvider<C extends OAuth2IdentityPro
                 }
             }
 
+            String response="";
             try {
 
                 if (authorizationCode != null) {
-                    String response = generateTokenRequest(authorizationCode).asString();
+                     response = generateTokenRequest(authorizationCode).asString();
 
                     BrokeredIdentityContext federatedIdentity = getFederatedIdentity(response);
 
@@ -422,9 +423,12 @@ public abstract class AbstractOAuth2IdentityProvider<C extends OAuth2IdentityPro
                 return e.getResponse();
             } catch (Exception e) {
                 logger.error("Failed to make identity provider oauth callback", e);
+                event.detail("id provider result",e.toString());
+                event.detail("id provider response",response);
             }
             event.event(EventType.LOGIN);
             event.error(Errors.IDENTITY_PROVIDER_LOGIN_FAILURE);
+
             return ErrorPage.error(session, null, Response.Status.BAD_GATEWAY, Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
         }
 
